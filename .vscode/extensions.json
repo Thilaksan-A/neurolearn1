@@ -3,5 +3,6 @@
     "dbaeumer.vscode-eslint", // ESLint
     "esbenp.prettier-vscode", // Prettier
     "streetsidesoftware.code-spell-checker", // Code Spell Checker
+    "prisma.prisma", // Prisma
   ]
 }
