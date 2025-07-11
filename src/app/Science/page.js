@@ -377,10 +377,17 @@ export default function LessonScreen() {
                   onClick={() => {
                     setSelectedAnswer(null);
                     setFeedback(null);
-                    setCurrentQuestionIndex((prev) => prev + 1);
+              
+                    if (currentQuestionIndex + 1 < questions.length) {
+                      setCurrentQuestionIndex((prev) => prev + 1);
+                    } else {
+                      router.push('/Endpage'); // redirect when finished
+                    }
                   }}
                 >
-                  Continue to Next Question →
+                  {currentQuestionIndex + 1 < questions.length
+                    ? 'Continue to Next Question →'
+                    : 'Finish'}
                 </Button>
               )}
             </CardContent>

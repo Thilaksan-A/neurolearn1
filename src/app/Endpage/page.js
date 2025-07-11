@@ -2,35 +2,32 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trophy, Star, ArrowRight, Home, BookOpen, Clock, Users } from "lucide-react"
-import { useRouter } from 'next/router';
+import { Trophy, ArrowRight, BookOpen, Clock, Worm, BookOpenText } from "lucide-react"
+import { useRouter } from 'next/navigation';
 
 export default function Component() {
   const router = useRouter();
-  
+
   const relatedCourses = [
     {
       id: 1,
-      title: "Advanced JavaScript Concepts",
-      description: "Deep dive into closures, prototypes, and async programming",
-      duration: "6 hours",
-      rating: 4.8,
-      image: "/placeholder.svg?height=200&width=300",
+      title: "Butterfly Lifecycle",
+      description: "Learn about how capterpillars turn into butterflies!",
+      duration: "10 mins",
+      image: Worm,
     },
     {
       id: 2,
-      title: "React Hooks Mastery",
-      description: "Master useState, useEffect, and custom hooks",
-      duration: "4 hours",
-      rating: 4.9,
+      title: "Types of rocks",
+      description: "Learn about the different rocks that exist in the world.",
+      duration: "20 mins",
       image: "/placeholder.svg?height=200&width=300",
     },
     {
       id: 3,
-      title: "Node.js Backend Development",
-      description: "Build scalable APIs with Express and MongoDB",
-      duration: "8 hours",
-      rating: 4.7,
+      title: "Trees",
+      description: "Learn about the different trees that grow in our forest",
+      duration: "15 mins",
       image: "/placeholder.svg?height=200&width=300",
     },
   ]
@@ -44,7 +41,6 @@ export default function Component() {
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Congratulations! 🎉</h1>
           <p className="text-xl text-gray-600 mb-2">You've successfully completed the course!</p>
-          <p className="text-gray-500">Your dedication to learning is truly inspiring. Keep up the great work!</p>
 
           <div className="flex justify-center gap-8 mt-8">
             <div className="text-center">
@@ -55,42 +51,26 @@ export default function Component() {
               <div className="text-2xl font-bold text-blue-600">15</div>
               <div className="text-sm text-gray-500">Questions Answered</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">A+</div>
-              <div className="text-sm text-gray-500">Final Grade</div>
-            </div>
           </div>
         </div>
-
+        <div className="flex items-center justify-center pb-8">
+          <Button onClick={() => router.push('/Homepage')}>Back to Home</Button>
+        </div>
         <div className="mb-12">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Continue Your Learning Journey</h2>
-            <p className="text-gray-600">Based on what you've learned, here are some courses we recommend</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedCourses.map((course) => (
               <Card key={course.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
-                <CardHeader className="p-0">
-                  <div className="aspect-video bg-gray-100 rounded-t-lg overflow-hidden">
-                    <img
-                      src={course.image || "/placeholder.svg"}
-                      alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                </CardHeader>
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{course.rating}</span>
-                    </div>
-                  </div>
-
-                  <CardTitle className="text-lg mb-2 group-hover:text-blue-600 transition-colors">
-                    {course.title}
-                  </CardTitle>
+                  <div className="pb-4">
+                    <BookOpenText />
+                   </div>
+                <CardTitle className="text-lg mb-2 group-hover:text-blue-600 transition-colors">
+                  {course.title}
+                </CardTitle>
 
                   <CardDescription className="text-sm text-gray-600 mb-4">{course.description}</CardDescription>
 
