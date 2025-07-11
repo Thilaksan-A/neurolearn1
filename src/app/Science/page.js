@@ -41,13 +41,6 @@ const questions = [
     
 ]
 
-const mcqOptions = [
-  { id: "a", text: "Evaporation", isCorrect: true },
-  { id: "b", text: "Condensation", isCorrect: false },
-  { id: "c", text: "Precipitation", isCorrect: false },
-  { id: "d", text: "Collection", isCorrect: false },
-]
-
 export default function LessonScreen() {
   const [showAdaptiveContent, setShowAdaptiveContent] = useState(false)
 //   const [learningStyle, setLearningStyle] = useState<LearningStyle>("visual") // Simulated from sign-up
