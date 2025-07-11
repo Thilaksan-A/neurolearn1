@@ -2,8 +2,8 @@ import { z } from "zod"
 
 export const SurveySchema = z.object({
     question_1: z.enum([
-        "Say the list out loud or repeat it to myself",
         "Picture the list in my head or write it out using symbols/diagrams",
+        "Say the list out loud or repeat it to myself",
         "Write the list down or read it repeatedly",
     ]),
 
@@ -28,11 +28,11 @@ export const SurveySchema = z.object({
     question_5: z.enum([
         "Draw them a map",
         "Explain it to them verbally",
-        "Write them a step-by-step instructions"
+        "Write them step-by-step instructions",
     ]),
 
     question_6: z.enum([
-        "Using mind maps, hightlighters, or diagrams",
+        "Using mind maps, highlighters, or diagrams",
         "Joining a study group or listening to recordings",
         "Writing summaries and rereading notes",
     ]),
