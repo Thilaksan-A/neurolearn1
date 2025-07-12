@@ -2,11 +2,10 @@ import { HumeService } from "@/services";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
-const humeService = new HumeService();
-
 export async function POST(request: NextRequest) {
   try {
+    const prisma = new PrismaClient();
+    const humeService = new HumeService();
     const { text, learnerType } = await request.json();
 
     if (!text || !learnerType) {
