@@ -33,7 +33,7 @@ enum SurveyQuestion {
 }
 
 // Define learner types as constants for consistency
-const LEARNER_TYPES = {
+const LEARNER_TYPES: Record<string, LearnerType> = {
   VISUAL: "visual",
   AUDITORY: "auditory",
   READER: "reader",
