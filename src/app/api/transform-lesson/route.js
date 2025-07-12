@@ -78,19 +78,28 @@ export async function POST(request) {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-1.5-flash-8b",
       contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
     });
 
     let text = response.text ?? "No output generated";
+    // console.log("AI response:", text);
+
     if (learningStyle == "auditory") {
       text = text.replace(/\n\n+/g, " ");
     }
     if (learningStyle == "visual") {
-      text = raw.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+      const cleanResponse = text
+        .replace(/^```json\s*/, "") // Remove leading code block
+        .replace(/\s*```$/, "") // Remove trailing code block
+        .trim(); // Trim any remaining extra spaces/newlines
+
+      const cleanedFinalResponse = cleanResponse.replace(/`+$/, "").trim();
+      console.log(cleanedFinalResponse);
       let parsed;
       try {
-        parsed = JSON.parse(raw);
+        parsed = JSON.parse(cleanedFinalResponse);
+        return NextResponse.json({ transformed: parsed });
       } catch (e) {
         console.error("Failed to parse AI JSON:", e);
         return NextResponse.json(
