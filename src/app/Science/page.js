@@ -69,12 +69,72 @@ export default function LessonScreen() {
   const [timerPhase, setTimerPhase] = useState("focus");
   const intervalRef = useRef(null);
   const [showTimerPopout, setShowTimerPopout] = useState(false);
+  const [learningStyle, setLearningStyle] = useState(null);
+  const [lessonText, setLessonText] = useState(
+    `
+    The water cycle shows how water moves through our planet. First, the sun heats up water in rivers, 
+    lakes, and oceans. This water becomes vapor and rises into the air - this is called evaporation. The 
+    water vapor cools down and turns into tiny drops to form clouds - this is called condensation. When 
+    the clouds get heavy, the water falls abck to the ground as rain - this is called precipitation. Water 
+    then flows back in rivers, lakes, and oceans and the cycle starts again
+  `
+  );
+  const [helpActivated, setHelpActivated] = useState(false);
+  const [aiSteps, setAiSteps] = useState([]); //used if there visual
+  const [auditoryText, setAuditoryText] = useState(""); ///used if there auditory
+  const [readerText, setReaderText] = useState(""); // used for reader/adhd style more compact succint
+  const [loadingHelp, setLoadingHelp] = useState(false); // used for spinner in the loading button
   const { speak, isLoading, error } = useTTS();
 
-  const handleHelpMe = () => {
-    setShowAdaptiveContent(true);
-  };
+  const handleHelpMeClick = async () => {
+    if (loadingHelp || helpActivated) return;
+    setLoadingHelp(true);
+    try {
+      const response = await fetch("/api/transform-lesson", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lesson: lessonText,
+          learningStyle,
+        }),
+      });
 
+      if (!response.ok) {
+        console.error("Failed to fetch learning style");
+        setLoadingHelp(false);
+        return;
+      }
+      setHelpActivated(true);
+      const data = await response.json();
+      console.log(data);
+      if (learningStyle == "visual") {
+        const transformedWithImages = data.transformed.map((step, index) => ({
+          text: step.text,
+          image: `/images/${index + 1}.jpeg`,
+        }));
+        setAiSteps(transformedWithImages);
+        const combinedText = data.transformed
+          .map((step) => step.text)
+          .join(" ");
+        setLessonText(combinedText);
+        console.log(combinedText);
+      }
+      if (learningStyle == "auditory") {
+        setAuditoryText(data.transformed);
+        setLessonText(data.transformed);
+      }
+      if (learningStyle == "reader") {
+        setReaderText(data.transformed);
+        setLessonText(data.transformed);
+      }
+    } catch (error) {
+      console.error("Error during help process:", error);
+    } finally {
+      setLoadingHelp(false);
+    }
+  };
   const handleAnswerSelect = (optionId) => {
     setSelectedAnswer(optionId);
     const selectedOption = currentQuestion.options.find(
@@ -103,6 +163,7 @@ export default function LessonScreen() {
   };
 
   const startTimer = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setIsTimerRunning(true);
   };
 
@@ -122,6 +183,34 @@ export default function LessonScreen() {
       .toString()
       .padStart(2, "0")}`;
   };
+
+  useEffect(() => {
+    async function fetchLearningStyle() {
+      try {
+        const token = localStorage.getItem("token"); // get token from localStorage
+        if (!token) throw new Error("No token found");
+
+        const res = await fetch("/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`, // send token in header
+          },
+        });
+
+        console.log(res);
+        if (!res.ok) throw new Error("Failed to fetch learner style");
+
+        const data = await res.json();
+        setLearningStyle(data.learner_type); // match what your API returns
+        console.log(data.learner_type);
+        localStorage.setItem("learner_type", data.learner_type);
+      } catch (error) {
+        console.error("Error fetching learner style:", error);
+        setLearningStyle(null); // or a default value
+      }
+    }
+
+    fetchLearningStyle();
+  }, []);
 
   useEffect(() => {
     if (isTimerRunning && currentTime > 0) {
@@ -289,47 +378,169 @@ export default function LessonScreen() {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="prose prose-lg max-w-none">
-                <p className="text-xl leading-relaxed text-slate-700">
-                  The water cycle shows how water moves through our planet.
-                </p>
+              {!helpActivated && (
+                <div className="prose prose-lg max-w-none">
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    The water cycle shows how water moves through our planet.
+                  </p>
 
-                <p className="text-xl leading-relaxed text-slate-700">
-                  First, the sun heats up water in rivers, lakes, and oceans.
-                  This water becomes vapor and rises into the air — this is
-                  called <strong className="text-blue-600">evaporation</strong>.
-                </p>
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    First, the sun heats up water in rivers, lakes, and oceans.
+                    This water becomes vapor and rises into the air — this is
+                    called{" "}
+                    <strong className="text-blue-600">evaporation</strong>.
+                  </p>
 
-                <p className="text-xl leading-relaxed text-slate-700">
-                  The water vapor cools down and turns into tiny drops to form
-                  clouds — this is called{" "}
-                  <strong className="text-purple-600">condensation</strong>.
-                </p>
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    The water vapor cools down and turns into tiny drops to form
+                    clouds — this is called{" "}
+                    <strong className="text-purple-600">condensation</strong>.
+                  </p>
 
-                <p className="text-xl leading-relaxed text-slate-700">
-                  When the clouds get heavy, the water falls back to the ground
-                  as rain — this is called{" "}
-                  <strong className="text-green-600">precipitation</strong>.
-                </p>
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    When the clouds get heavy, the water falls back to the
+                    ground as rain — this is called{" "}
+                    <strong className="text-green-600">precipitation</strong>.
+                  </p>
 
-                <p className="text-xl leading-relaxed text-slate-700">
-                  Water then flows back into rivers, lakes, and oceans — and the
-                  cycle starts again!
-                </p>
-              </div>
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    Water then flows back into rivers, lakes, and oceans — and
+                    the cycle starts again!
+                  </p>
+                </div>
+              )}
 
-              {renderAdaptiveContent()}
+              {helpActivated && learningStyle == "visual" && (
+                <div className="space-y-8">
+                  {aiSteps.map((step, index) => (
+                    <div key={index} className="space-y-4">
+                      <p className="text-xl leading-relaxed text-slate-700">
+                        {step.text}
+                      </p>
+                      <img
+                        src={step.image}
+                        alt={`Step ${index + 1}`}
+                        className="w-full rounded-xl shadow-md"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {helpActivated && learningStyle === "auditory" && (
+                <div className="prose prose-lg max-w-none space-y-4">
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    <i>
+                      Make sure to press the audio button to listen to the
+                      enhanced experience
+                    </i>
+                  </p>
+                  {auditoryText
+                    .split(/\n|\.\s+/) // Split by newline or period+space
+                    .filter((p) => p.trim() !== "") // Remove empty lines
+                    .map((para, idx) => (
+                      <p
+                        key={idx}
+                        className="text-xl leading-relaxed text-slate-700"
+                      >
+                        {para.trim()}
+                        {para.endsWith(".") ? "" : "."}
+                      </p>
+                    ))}
+                </div>
+              )}
+
+              {helpActivated && learningStyle === "reader" && (
+                <ul className="list-disc list-inside space-y-2 text-xl text-slate-700 max-w-none prose prose-lg">
+                  {readerText
+                    .split("\n")
+                    .filter((line) => line.trim() !== "")
+                    .map((line, idx) => {
+                      // Parse bold: find **text** and wrap in <strong>
+                      const parts = line.split(/(\*\*.*?\*\*)/g); // split by bold parts
+                      return (
+                        <li key={idx}>
+                          {parts.map((part, i) =>
+                            part.startsWith("**") && part.endsWith("**") ? (
+                              <strong key={i}>{part.slice(2, -2)}</strong>
+                            ) : (
+                              part
+                            )
+                          )}
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+              {/* {lessonContent.map(({ text, visual }, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col lg:flex-row items-center gap-6"
+                >
+                  <div className="prose prose-lg max-w-none flex-1">
+                    <p className="text-xl leading-relaxed text-slate-700">
+                      {text}
+                    </p>
+                  </div>
+                  <div className="flex-1">
+                    <img
+                      src={`/images/${visual}`}
+                      alt={`Visual for step ${idx + 1}`}
+                      className="rounded-lg border border-slate-300 shadow-md max-w-full"
+                    />
+                  </div>
+                </div>
+              ))} */}
+
+              {/* {renderAdaptiveContent()} */}
 
               {/* Help Me Button */}
               <div className="flex justify-start pt-4">
-                <Button
-                  onClick={handleHelpMe}
+                {/* <Button
+                  onClick={handleHelpMeClick}
                   size="lg"
                   className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-3 focus:ring-4 focus:ring-amber-300"
-                  disabled={showAdaptiveContent}
+                  disabled={helpActivated || loadingHelp}
                 >
                   <HelpCircle className="h-5 w-5 mr-2" />
-                  {showAdaptiveContent ? "Help Added!" : "Help Me"}
+                  {helpActivated ? "Hope this helped" : "I Dont Understand"}
+                </Button> */}
+                <Button
+                  onClick={handleHelpMeClick}
+                  size="lg"
+                  className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-3 focus:ring-4 focus:ring-amber-300 flex items-center justify-center"
+                  disabled={helpActivated || loadingHelp}
+                >
+                  {loadingHelp ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        ></path>
+                      </svg>
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <HelpCircle className="h-5 w-5 mr-2" />
+                      {helpActivated ? "Hope this helped" : "I Dont Understand"}
+                    </>
+                  )}
                 </Button>
               </div>
             </CardContent>

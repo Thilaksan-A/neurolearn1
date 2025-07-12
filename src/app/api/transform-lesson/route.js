@@ -4,18 +4,11 @@ import { NextResponse } from "next/server";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const stylePrompts = {
-  visual:
-    // "Reformat this lesson to help a visual learner. Use vivid imagery, spatial language, or suggest simple diagrams.",
-    // `
-    //   You're teaching a student who is a visual learner.
-    //   Transform the following lesson using vivid imagery, spatial language, and descriptive language.
-    //   Where helpful, suggest visuals, diagrams, or comparisons to help them picture the ideas in their mind.
-    //   Speak directly to the student as if you're guiding them through the topic visually.
-    // `,
-    `You are teaching a student who is a visual learner.
+  visual: `You are teaching a student who is a visual learner.
     Transform the following lesson using vivid imagery, spatial language, and descriptive language.
     Speak directly to the student as if you're guiding them visually through the topic.
     Where helpful, include suggestions for visuals, diagrams, or comparisons that help the student picture the ideas.
+    Try to break it down into 5 steps
     Output ONLY valid JSON: an array of objects, each with two keys:
     - "text": the narration text for that step
     - "visual": a brief description of a suggested visual or diagram (or null if none)
@@ -66,7 +59,8 @@ const stylePrompts = {
 
 export async function POST(request) {
   const { lesson, learningStyle } = await request.json();
-
+  console.log("hit here");
+  console.log(lesson, learningStyle);
   if (!lesson || !learningStyle || !stylePrompts[learningStyle]) {
     return NextResponse.json(
       { error: "Missing or invalid input" },
