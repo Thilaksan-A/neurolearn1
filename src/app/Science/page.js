@@ -1,5 +1,6 @@
 "use client";
 
+import SpeakerButton from "@/components/SpeakerButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,6 @@ import {
   Play,
   RotateCcw,
   Timer,
-  Volume2,
   XCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -57,7 +57,6 @@ export default function LessonScreen() {
   //   const [learningStyle, setLearningStyle] = useState<LearningStyle>("visual") // Simulated from sign-up
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [feedback, setFeedback] = useState(null);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const currentQuestion = questions[currentQuestionIndex];
   const router = useRouter();
@@ -144,12 +143,6 @@ export default function LessonScreen() {
   const handleRetry = () => {
     setSelectedAnswer(null);
     setFeedback(null);
-  };
-
-  const handleAudioPlay = () => {
-    setIsAudioPlaying(true);
-    // Simulate audio playing - in real app, integrate with HumeAI
-    setTimeout(() => setIsAudioPlaying(false), 3000);
   };
 
   const startTimer = () => {
@@ -291,20 +284,10 @@ export default function LessonScreen() {
                 <CardTitle className="text-3xl font-bold text-slate-800">
                   The Water Cycle 💧
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleAudioPlay}
-                  disabled={isAudioPlaying}
-                  className="h-12 w-12 rounded-full hover:bg-blue-50 focus:ring-4 focus:ring-blue-300 bg-transparent"
-                  aria-label="Listen to lesson content"
-                >
-                  <Volume2
-                    className={`h-6 w-6 ${
-                      isAudioPlaying ? "text-blue-600" : "text-slate-600"
-                    }`}
-                  />
-                </Button>
+                <SpeakerButton
+                  textToSpeak={lessonText}
+                  learnerType={learningStyle}
+                />
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
