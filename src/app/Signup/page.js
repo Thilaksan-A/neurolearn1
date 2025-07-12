@@ -31,6 +31,7 @@ export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [error, setError] = useState("");
   
   const form = useForm({
@@ -88,6 +89,8 @@ export default function Signup() {
           <Brain className="h-10 w-10 text-gray-700" />
         </div>
         <p className="text-center pt-4 text-2xl font-semibold text-gray-800">Sign Up</p>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-3">
         <div className="py-3">
           <p className="mb-2 text-black py-2">Full Name</p>
           <Input type="text" placeholder="Name" required aria-label="Full Name" />
@@ -100,8 +103,7 @@ export default function Signup() {
           <p className="mb-2 text-black">Password</p>
           <Input type="password" placeholder="Password" required aria-label="Password" />
         </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-3">
+        
             <FormField
               control={form.control}
               name="occupation"

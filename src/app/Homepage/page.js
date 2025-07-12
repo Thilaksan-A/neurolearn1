@@ -73,10 +73,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/Login"); // redirect to login if token is missing
-      return;
-    }
+    // if (!token) {
+    //   router.push("/Login"); // redirect to login if token is missing
+    //   return;
+    // }
 
     try {
       const decoded = jwtDecode(token);
@@ -86,7 +86,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Invalid token", err);
       localStorage.removeItem("token");
-      router.push("/Login");
+      // router.push("/Login");
     }
   }, []);
 
