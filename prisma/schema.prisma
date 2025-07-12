@@ -14,4 +14,19 @@ model User {
   createdAt    DateTime @default(now())
   learner_type String?
   name         String
+
+  surveys      Survey[]
+}
+
+model Survey {
+  id            String   @id @default(uuid())
+  user_id        String
+  visual_score   Int
+  auditory_score Int
+  reader_score   Int
+  answers         String
+  learner_type   String
+  created_at     DateTime @default(now())
+
+  user          User    @relation(fields: [user_id], references: [id])
 }

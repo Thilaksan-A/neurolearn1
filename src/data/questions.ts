@@ -1,4 +1,4 @@
-const Questions = [
+export const QUESTIONS = [
   {
     id: 1,
     question: "How do you memorise information?",
@@ -6,7 +6,7 @@ const Questions = [
       "Picture the list in my head or write it out using symbols/diagrams",
       "Say the list out loud or repeat it to myself",
       "Write the list down or read it repeatedly",
-    ]
+    ],
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ const Questions = [
       "I see a diagram, chart, or visual representation",
       "Someone explains it to me out loud",
       "I read about it in a textbook or notes",
-    ]
+    ],
   },
   {
     id: 3,
@@ -24,7 +24,7 @@ const Questions = [
       "Look at the diagram or interface map",
       "Have someone talk me through the steps",
       "Read the manual or help documentation",
-    ]
+    ],
   },
   {
     id: 4,
@@ -33,7 +33,7 @@ const Questions = [
       "Slides with images, graphs, or videos",
       "Lectures and discussions",
       "Handouts, readings and written instructions",
-    ]
+    ],
   },
   {
     id: 5,
@@ -42,7 +42,7 @@ const Questions = [
       "Draw them a map",
       "Explain it to them verbally",
       "Write them step-by-step instructions",
-    ]
+    ],
   },
   {
     id: 6,
@@ -51,7 +51,6 @@ const Questions = [
       "Using mind maps, highlighters, or diagrams",
       "Joining a study group or listening to recordings",
       "Writing summaries and rereading notes",
-    ]
+    ],
   },
 ];
-export default Questions;
