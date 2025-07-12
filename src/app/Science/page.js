@@ -220,66 +220,6 @@ export default function LessonScreen() {
     };
   }, [isTimerRunning, currentTime]);
 
-  const renderAdaptiveContent = () => {
-    if (!showAdaptiveContent) return null;
-
-    if (learningStyle === "visual") {
-      return (
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-          <h3 className="text-xl font-semibold text-slate-800 mb-4">
-            Visual Guide
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-white rounded-lg">
-              <div className="text-4xl mb-2">☀️💧</div>
-              <p className="text-sm font-medium">Evaporation</p>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg">
-              <div className="text-4xl mb-2">☁️</div>
-              <p className="text-sm font-medium">Condensation</p>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg">
-              <div className="text-4xl mb-2">🌧️</div>
-              <p className="text-sm font-medium">Precipitation</p>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg">
-              <div className="text-4xl mb-2">🏞️</div>
-              <p className="text-sm font-medium">Collection</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="mt-6 p-4 bg-green-50 rounded-lg border-2 border-green-200">
-        <h3 className="text-xl font-semibold text-slate-800 mb-4">
-          Key Definitions
-        </h3>
-        <div className="space-y-3">
-          <div className="p-3 bg-white rounded-lg">
-            <p className="font-medium text-slate-800">Evaporation:</p>
-            <p className="text-slate-600">
-              When liquid water changes into invisible water vapor due to heat.
-            </p>
-          </div>
-          <div className="p-3 bg-white rounded-lg">
-            <p className="font-medium text-slate-800">Condensation:</p>
-            <p className="text-slate-600">
-              When water vapor cools and changes back into tiny water droplets.
-            </p>
-          </div>
-          <div className="p-3 bg-white rounded-lg">
-            <p className="font-medium text-slate-800">Precipitation:</p>
-            <p className="text-slate-600">
-              When water falls from clouds as rain, snow, or hail.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-7xl mx-auto">
