@@ -82,8 +82,11 @@ export default function LessonScreen() {
   const [aiSteps, setAiSteps] = useState([]); //used if there visual
   const [auditoryText, setAuditoryText] = useState(""); ///used if there auditory
   const [readerText, setReaderText] = useState(""); // used for reader/adhd style more compact succint
+  const [loadingHelp, setLoadingHelp] = useState(false); // used for spinner in the loading button
 
   const handleHelpMeClick = async () => {
+    if (loadingHelp || helpActivated) return;
+    setLoadingHelp(true);
     try {
       const response = await fetch("/api/transform-lesson", {
         method: "POST",
@@ -98,6 +101,7 @@ export default function LessonScreen() {
 
       if (!response.ok) {
         console.error("Failed to fetch learning style");
+        setLoadingHelp(false);
         return;
       }
       setHelpActivated(true);
@@ -123,9 +127,10 @@ export default function LessonScreen() {
         setReaderText(data.transformed);
         setLessonText(data.transformed);
       }
-      // Fetch lesson content based on style
     } catch (error) {
       console.error("Error during help process:", error);
+    } finally {
+      setLoadingHelp(false);
     }
   };
   const handleAnswerSelect = (optionId) => {
@@ -421,14 +426,51 @@ export default function LessonScreen() {
 
               {/* Help Me Button */}
               <div className="flex justify-start pt-4">
-                <Button
+                {/* <Button
                   onClick={handleHelpMeClick}
                   size="lg"
                   className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-3 focus:ring-4 focus:ring-amber-300"
-                  disabled={showAdaptiveContent}
+                  disabled={helpActivated || loadingHelp}
                 >
                   <HelpCircle className="h-5 w-5 mr-2" />
-                  {showAdaptiveContent ? "Help Added!" : "Help Me"}
+                  {helpActivated ? "Hope this helped" : "I Dont Understand"}
+                </Button> */}
+                <Button
+                  onClick={handleHelpMeClick}
+                  size="lg"
+                  className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-3 focus:ring-4 focus:ring-amber-300 flex items-center justify-center"
+                  disabled={helpActivated || loadingHelp}
+                >
+                  {loadingHelp ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        ></path>
+                      </svg>
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <HelpCircle className="h-5 w-5 mr-2" />
+                      {helpActivated ? "Hope this helped" : "I Dont Understand"}
+                    </>
+                  )}
                 </Button>
               </div>
             </CardContent>
