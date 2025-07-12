@@ -5,7 +5,7 @@ import { HumeClient } from "hume";
 const VOICE_IDS = {
   visual: process.env.VISUAL_LEARNER_VOICE_ID,
   auditory: process.env.AUDITORY_VOICE_ID,
-  reading: process.env.READER_VOICE_ID,
+  reader: process.env.READER_VOICE_ID,
 } as const;
 
 export class HumeService {
@@ -66,7 +66,7 @@ export class HumeService {
         return `Now, let me explain this visually: ${text}`;
       case "auditory":
         return `Listen carefully as I explain: ${text}`;
-      case "reading":
+      case "reader":
         return `Here's the precise explanation: ${text}`;
       default:
         return text;
