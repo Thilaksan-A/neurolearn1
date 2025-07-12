@@ -8,15 +8,18 @@ import { useState } from "react";
 function Survey() {
   const [stepIndex, setStepIndex] = useState(0);
   const [selected, setSelected] = useState(null);
+  const [answers, setAnswers] = useState({});
   const question = Questions[stepIndex];
   const router = useRouter();
   if (!question) return null;
 
   const handleSelect = (option) => {
     setSelected(option);
-    setTimeout(() => {
-      handleNext();
-    }, 300);
+    setAnswers(prev => ({
+      ...prev,
+      [`question_${question.id}`]: option
+    }));
+    setTimeout(handleNext, 300);
   };
 
   const handleNext = () => {
@@ -35,9 +38,24 @@ function Survey() {
     }
   };
 
-  const onComplete = () => {
-    router.push("/Homepage");
-  };
+  const onComplete = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("/api/survey/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(answers),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Submission failed");
+      router.push("/Homepage");
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <div className="flex justify-center items-center h-screen flex-col">
