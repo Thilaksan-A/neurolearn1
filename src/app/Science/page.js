@@ -69,11 +69,65 @@ export default function LessonScreen() {
   const intervalRef = useRef(null);
   const [showTimerPopout, setShowTimerPopout] = useState(false);
   const [learningStyle, setLearningStyle] = useState(null);
+  const [lessonText, setLessonText] = useState(
+    `
+    The water cycle shows how water moves through our planet. First, the sun heats up water in rivers, 
+    lakes, and oceans. This water becomes vapor and rises into the air - this is called evaporation. The 
+    water vapor cools down and turns into tiny drops to form clouds - this is called condensation. When 
+    the clouds get heavy, the water falls abck to the ground as rain - this is called precipitation. Water 
+    then flows back in rivers, lakes, and oceans and the cycle starts again
+  `
+  );
+  const [helpActivated, setHelpActivated] = useState(false);
+  const [aiSteps, setAiSteps] = useState([]); //used if there visual
+  const [auditoryText, setAuditoryText] = useState(""); ///used if there auditory
+  const [readerText, setReaderText] = useState(""); // used for reader/adhd style more compact succint
 
-  const handleHelpMe = () => {
-    setShowAdaptiveContent(true);
+  const handleHelpMeClick = async () => {
+    try {
+      const response = await fetch("/api/transform-lesson", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lesson: lessonText,
+          learningStyle,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to fetch learning style");
+        return;
+      }
+      setHelpActivated(true);
+      const data = await response.json();
+      console.log(data);
+      if (learningStyle == "visual") {
+        const transformedWithImages = data.transformed.map((step, index) => ({
+          text: step.text,
+          image: `/images/${index + 1}.jpeg`,
+        }));
+        setAiSteps(transformedWithImages);
+        const combinedText = data.transformed
+          .map((step) => step.text)
+          .join(" ");
+        setLessonText(combinedText);
+        console.log(combinedText);
+      }
+      if (learningStyle == "auditory") {
+        setAuditoryText(data.transformed);
+        setLessonText(data.transformed);
+      }
+      if (learningStyle == "reader") {
+        setReaderText(data.transformed);
+        setLessonText(data.transformed);
+      }
+      // Fetch lesson content based on style
+    } catch (error) {
+      console.error("Error during help process:", error);
+    }
   };
-
   const handleAnswerSelect = (optionId) => {
     setSelectedAnswer(optionId);
     const selectedOption = currentQuestion.options.find(
@@ -94,6 +148,7 @@ export default function LessonScreen() {
   };
 
   const startTimer = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setIsTimerRunning(true);
   };
 
@@ -114,23 +169,6 @@ export default function LessonScreen() {
       .padStart(2, "0")}`;
   };
 
-  // useEffect(() => {
-  //   async function fetchLearningStyle() {
-  //     try {
-  //       const res = await fetch("/api/me");
-  //       if (!res.ok) throw new Error("Failed to fetch learner style");
-  //       const data = await res.json();
-  //       setLearningStyle(data.learningStyle); // expects { learningStyle: "visual" | "reading" | ... }
-  //       console.log(learningStyle);
-  //     } catch (error) {
-  //       console.error("Error fetching learner style:", error);
-  //       setLearningStyle(null); // or a default value
-  //     }
-  //   }
-
-  //   fetchLearningStyle();
-  // }, []);
-
   useEffect(() => {
     async function fetchLearningStyle() {
       try {
@@ -149,7 +187,7 @@ export default function LessonScreen() {
         const data = await res.json();
         setLearningStyle(data.learner_type); // match what your API returns
         console.log(data.learner_type);
-        localStorage.setItem("learner_type", learner_type);
+        localStorage.setItem("learner_type", data.learner_type);
       } catch (error) {
         console.error("Error fetching learner style:", error);
         setLearningStyle(null); // or a default value
@@ -183,66 +221,6 @@ export default function LessonScreen() {
       }
     };
   }, [isTimerRunning, currentTime]);
-
-  const renderAdaptiveContent = () => {
-    if (!showAdaptiveContent) return null;
-
-    if (learningStyle === "visual") {
-      return (
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-          <h3 className="text-xl font-semibold text-slate-800 mb-4">
-            Visual Guide
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-white rounded-lg">
-              <div className="text-4xl mb-2">☀️💧</div>
-              <p className="text-sm font-medium">Evaporation</p>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg">
-              <div className="text-4xl mb-2">☁️</div>
-              <p className="text-sm font-medium">Condensation</p>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg">
-              <div className="text-4xl mb-2">🌧️</div>
-              <p className="text-sm font-medium">Precipitation</p>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg">
-              <div className="text-4xl mb-2">🏞️</div>
-              <p className="text-sm font-medium">Collection</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="mt-6 p-4 bg-green-50 rounded-lg border-2 border-green-200">
-        <h3 className="text-xl font-semibold text-slate-800 mb-4">
-          Key Definitions
-        </h3>
-        <div className="space-y-3">
-          <div className="p-3 bg-white rounded-lg">
-            <p className="font-medium text-slate-800">Evaporation:</p>
-            <p className="text-slate-600">
-              When liquid water changes into invisible water vapor due to heat.
-            </p>
-          </div>
-          <div className="p-3 bg-white rounded-lg">
-            <p className="font-medium text-slate-800">Condensation:</p>
-            <p className="text-slate-600">
-              When water vapor cools and changes back into tiny water droplets.
-            </p>
-          </div>
-          <div className="p-3 bg-white rounded-lg">
-            <p className="font-medium text-slate-800">Precipitation:</p>
-            <p className="text-slate-600">
-              When water falls from clouds as rain, snow, or hail.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 p-6">
@@ -325,41 +303,126 @@ export default function LessonScreen() {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="prose prose-lg max-w-none">
-                <p className="text-xl leading-relaxed text-slate-700">
-                  The water cycle shows how water moves through our planet.
-                </p>
+              {!helpActivated && (
+                <div className="prose prose-lg max-w-none">
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    The water cycle shows how water moves through our planet.
+                  </p>
 
-                <p className="text-xl leading-relaxed text-slate-700">
-                  First, the sun heats up water in rivers, lakes, and oceans.
-                  This water becomes vapor and rises into the air — this is
-                  called <strong className="text-blue-600">evaporation</strong>.
-                </p>
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    First, the sun heats up water in rivers, lakes, and oceans.
+                    This water becomes vapor and rises into the air — this is
+                    called{" "}
+                    <strong className="text-blue-600">evaporation</strong>.
+                  </p>
 
-                <p className="text-xl leading-relaxed text-slate-700">
-                  The water vapor cools down and turns into tiny drops to form
-                  clouds — this is called{" "}
-                  <strong className="text-purple-600">condensation</strong>.
-                </p>
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    The water vapor cools down and turns into tiny drops to form
+                    clouds — this is called{" "}
+                    <strong className="text-purple-600">condensation</strong>.
+                  </p>
 
-                <p className="text-xl leading-relaxed text-slate-700">
-                  When the clouds get heavy, the water falls back to the ground
-                  as rain — this is called{" "}
-                  <strong className="text-green-600">precipitation</strong>.
-                </p>
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    When the clouds get heavy, the water falls back to the
+                    ground as rain — this is called{" "}
+                    <strong className="text-green-600">precipitation</strong>.
+                  </p>
 
-                <p className="text-xl leading-relaxed text-slate-700">
-                  Water then flows back into rivers, lakes, and oceans — and the
-                  cycle starts again!
-                </p>
-              </div>
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    Water then flows back into rivers, lakes, and oceans — and
+                    the cycle starts again!
+                  </p>
+                </div>
+              )}
 
-              {renderAdaptiveContent()}
+              {helpActivated && learningStyle == "visual" && (
+                <div className="space-y-8">
+                  {aiSteps.map((step, index) => (
+                    <div key={index} className="space-y-4">
+                      <p className="text-xl leading-relaxed text-slate-700">
+                        {step.text}
+                      </p>
+                      <img
+                        src={step.image}
+                        alt={`Step ${index + 1}`}
+                        className="w-full rounded-xl shadow-md"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {helpActivated && learningStyle === "auditory" && (
+                <div className="prose prose-lg max-w-none space-y-4">
+                  <p className="text-xl leading-relaxed text-slate-700">
+                    <i>
+                      Make sure to press the audio button to listen to the
+                      enhanced experience
+                    </i>
+                  </p>
+                  {auditoryText
+                    .split(/\n|\.\s+/) // Split by newline or period+space
+                    .filter((p) => p.trim() !== "") // Remove empty lines
+                    .map((para, idx) => (
+                      <p
+                        key={idx}
+                        className="text-xl leading-relaxed text-slate-700"
+                      >
+                        {para.trim()}
+                        {para.endsWith(".") ? "" : "."}
+                      </p>
+                    ))}
+                </div>
+              )}
+
+              {helpActivated && learningStyle === "reader" && (
+                <ul className="list-disc list-inside space-y-2 text-xl text-slate-700 max-w-none prose prose-lg">
+                  {readerText
+                    .split("\n")
+                    .filter((line) => line.trim() !== "")
+                    .map((line, idx) => {
+                      // Parse bold: find **text** and wrap in <strong>
+                      const parts = line.split(/(\*\*.*?\*\*)/g); // split by bold parts
+                      return (
+                        <li key={idx}>
+                          {parts.map((part, i) =>
+                            part.startsWith("**") && part.endsWith("**") ? (
+                              <strong key={i}>{part.slice(2, -2)}</strong>
+                            ) : (
+                              part
+                            )
+                          )}
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+              {/* {lessonContent.map(({ text, visual }, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col lg:flex-row items-center gap-6"
+                >
+                  <div className="prose prose-lg max-w-none flex-1">
+                    <p className="text-xl leading-relaxed text-slate-700">
+                      {text}
+                    </p>
+                  </div>
+                  <div className="flex-1">
+                    <img
+                      src={`/images/${visual}`}
+                      alt={`Visual for step ${idx + 1}`}
+                      className="rounded-lg border border-slate-300 shadow-md max-w-full"
+                    />
+                  </div>
+                </div>
+              ))} */}
+
+              {/* {renderAdaptiveContent()} */}
 
               {/* Help Me Button */}
               <div className="flex justify-start pt-4">
                 <Button
-                  onClick={handleHelpMe}
+                  onClick={handleHelpMeClick}
                   size="lg"
                   className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-3 focus:ring-4 focus:ring-amber-300"
                   disabled={showAdaptiveContent}
