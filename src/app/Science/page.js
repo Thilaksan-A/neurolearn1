@@ -149,6 +149,7 @@ export default function LessonScreen() {
         const data = await res.json();
         setLearningStyle(data.learner_type); // match what your API returns
         console.log(data.learner_type);
+        localStorage.setItem("learner_type", learner_type);
       } catch (error) {
         console.error("Error fetching learner style:", error);
         setLearningStyle(null); // or a default value
