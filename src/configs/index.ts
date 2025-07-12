@@ -1,1 +1,1 @@
-export * from "./hume";
+export * from "./voice-configs";
