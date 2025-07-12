@@ -37,8 +37,8 @@ export function useTTS() {
 
       // Set up audio event listeners
       audio.addEventListener("loadstart", () => {
-        setIsLoading(false); // Audio is ready, stop loading
-        setIsAudioPlaying(true); // Audio is about to play
+        setIsLoading(false);
+        setIsAudioPlaying(true);
       });
 
       audio.addEventListener("play", () => {
