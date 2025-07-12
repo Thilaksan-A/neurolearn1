@@ -1,10 +1,8 @@
 import { HumeService } from "@/services";
-import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const prisma = new PrismaClient();
     const humeService = new HumeService();
     const { text, learnerType } = await request.json();
 
@@ -37,7 +35,5 @@ export async function POST(request: NextRequest) {
       { error: "Failed to generate speech" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
