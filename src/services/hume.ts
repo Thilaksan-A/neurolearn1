@@ -2,11 +2,11 @@ import { VOICE_CONFIGS } from "@/configs";
 import { LearnerType } from "@/types";
 import { HumeClient } from "hume";
 
-const VOICE_IDS = {
-  visual: process.env.VISUAL_LEARNER_VOICE_ID,
-  auditory: process.env.AUDITORY_VOICE_ID,
-  reader: process.env.READER_VOICE_ID,
-} as const;
+const VOICE_IDS: Record<LearnerType, string> = {
+  visual: process.env.VISUAL_LEARNER_VOICE_ID!,
+  auditory: process.env.AUDITORY_VOICE_ID!,
+  reader: process.env.READER_VOICE_ID!,
+};
 
 export class HumeService {
   private client: HumeClient;
@@ -73,16 +73,7 @@ export class HumeService {
     }
   }
 
-  private includeVoiceNameInText(
-    text: string,
-    learnerType: LearnerType
-  ): string {
-    const voiceName = VOICE_CONFIGS[learnerType].name;
-
-    return `Hi, I'm ${voiceName}. ${text}`;
-  }
-
-  getAvailableVoices(): Record<string, string> {
+  getAvailableVoices(): Record<LearnerType, string> {
     return VOICE_IDS;
   }
 
