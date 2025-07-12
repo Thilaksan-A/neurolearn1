@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 
 export function useTTS() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const speak = useCallback(async (text: string, learnerType: LearnerType) => {
@@ -34,13 +35,29 @@ export function useTTS() {
 
       const audio = new Audio(audioUrl);
 
-      audio.addEventListener("error", (e) => {
-        console.error("Audio playback error:", e);
-        setError("Failed to play audio");
+      // Set up audio event listeners
+      audio.addEventListener("loadstart", () => {
+        setIsLoading(false); // Audio is ready, stop loading
+        setIsAudioPlaying(true); // Audio is about to play
+      });
+
+      audio.addEventListener("play", () => {
+        setIsAudioPlaying(true);
+      });
+
+      audio.addEventListener("pause", () => {
+        setIsAudioPlaying(false);
       });
 
       audio.addEventListener("ended", () => {
+        setIsAudioPlaying(false);
         URL.revokeObjectURL(audioUrl);
+      });
+
+      audio.addEventListener("error", (e) => {
+        console.error("Audio playback error:", e);
+        setError("Failed to play audio");
+        setIsAudioPlaying(false);
       });
 
       await audio.play();
@@ -52,5 +69,5 @@ export function useTTS() {
     }
   }, []);
 
-  return { speak, isLoading, error };
+  return { speak, isLoading, isAudioPlaying, error };
 }
