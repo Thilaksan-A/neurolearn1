@@ -1,9 +1,9 @@
 "use client";
 
+import SpeakerButton from "@/components/SpeakerButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTTS } from "@/hooks";
 import {
   ArrowLeft,
   CheckCircle,
@@ -12,7 +12,6 @@ import {
   Play,
   RotateCcw,
   Timer,
-  Volume2,
   XCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -83,20 +82,6 @@ export default function LessonScreen() {
   const [auditoryText, setAuditoryText] = useState(""); ///used if there auditory
   const [readerText, setReaderText] = useState(""); // used for reader/adhd style more compact succint
   const [loadingHelp, setLoadingHelp] = useState(false); // used for spinner in the loading button
-  const {
-    speak,
-    pauseAudio,
-    resumeAudio,
-    stopAudio,
-    togglePlayPause,
-    isLoading,
-    isAudioPlaying,
-    error,
-    currentTime: currentAudioTime,
-    duration,
-    formatTime: formatAudioTime,
-    audioRef,
-  } = useTTS();
 
   const handleHelpMeClick = async () => {
     if (loadingHelp || helpActivated) return;
@@ -158,18 +143,6 @@ export default function LessonScreen() {
   const handleRetry = () => {
     setSelectedAnswer(null);
     setFeedback(null);
-  };
-
-  const handleAudioPlay = () => {
-    if (audioRef.current && !isAudioPlaying) {
-      resumeAudio();
-      return;
-    }
-
-    const textToSpeak = `
-    THE WATER CYCLE.[pause]
-    `;
-    speak(textToSpeak, learningStyle);
   };
 
   const startTimer = () => {
@@ -371,64 +344,10 @@ export default function LessonScreen() {
                 <CardTitle className="text-3xl font-bold text-slate-800">
                   The Water Cycle 💧
                 </CardTitle>
-                <div className="relative group">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={
-                      isAudioPlaying
-                        ? togglePlayPause
-                        : audioRef.current
-                        ? resumeAudio // Resume if audio exists
-                        : handleAudioPlay // Generate new audio if none exists
-                    }
-                    loading={isLoading}
-                    className="h-12 w-12 rounded-full hover:bg-blue-50 focus:ring-4 focus:ring-blue-300 bg-transparent transition-all duration-200 relative overflow-hidden"
-                    aria-label={
-                      isLoading
-                        ? "Generating audio..."
-                        : isAudioPlaying
-                        ? "Pause audio"
-                        : "Listen to lesson content"
-                    }
-                  >
-                    {/* Button Content */}
-                    {isLoading ? (
-                      <div className="animate-spin h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full" />
-                    ) : isAudioPlaying ? (
-                      <div className="relative z-10">
-                        <Volume2 className="h-6 w-6 text-blue-600 group-hover:opacity-0 transition-opacity duration-200" />
-                        <Pause className="h-6 w-6 text-blue-600 absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      </div>
-                    ) : (
-                      <div className="relative z-10">
-                        <Volume2 className="h-6 w-6 text-slate-600 group-hover:opacity-0 transition-opacity duration-200" />
-                        <Play className="h-6 w-6 text-blue-600 absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      </div>
-                    )}
-                  </Button>
-
-                  {/* Stop Button */}
-                  {isAudioPlaying && (
-                    <Button
-                      onClick={stopAudio}
-                      variant="ghost"
-                      size="sm"
-                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white border-2 border-slate-300 hover:bg-red-50 hover:border-red-300 opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-sm"
-                      aria-label="Stop audio"
-                    >
-                      <XCircle className="h-4 w-4 text-slate-500 hover:text-red-500" />
-                    </Button>
-                  )}
-
-                  {/* Progress Tooltip */}
-                  {isAudioPlaying && (
-                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/75 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      {formatAudioTime(currentAudioTime)} /{" "}
-                      {formatAudioTime(duration)}
-                    </div>
-                  )}
-                </div>
+                <SpeakerButton
+                  textToSpeak={lessonText.substring(0, 50) + "..."}
+                  learnerType={learningStyle}
+                />
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
