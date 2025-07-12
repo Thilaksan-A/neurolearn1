@@ -345,7 +345,7 @@ export default function LessonScreen() {
                   The Water Cycle 💧
                 </CardTitle>
                 <SpeakerButton
-                  textToSpeak={lessonText.substring(0, 50) + "..."}
+                  textToSpeak={lessonText}
                   learnerType={learningStyle}
                 />
               </div>
