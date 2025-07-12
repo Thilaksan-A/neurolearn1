@@ -1,0 +1,47 @@
+question_1:
+  "Picture the list in my head or write it out using symbols/diagrams":
+    visual_score: 1
+  "Say the list out loud or repeat it to myself":
+    auditory_score: 1
+  "Write the list down or read it repeatedly":
+    read_write_score: 1
+
+question_2:
+  "I see a diagram, chart, or visual representation":
+    visual_score: 1
+  "Someone explains it to me out loud":
+    auditory_score: 1
+  "I read about it in a textbook or notes":
+    read_write_score: 1
+
+question_3:
+  "Look at the diagram or interface map":
+    visual_score: 1
+  "Have someone talk me through the steps":
+    auditory_score: 1
+  "Read the manual or help documentation":
+    read_write_score: 1
+
+question_4:
+  "Slides with images, graphs, or videos":
+    visual_score: 1
+  "Lectures and discussions":
+    auditory_score: 1
+  "Handouts, readings and written instructions":
+    read_write_score: 1
+
+question_5:
+  "Draw them a map":
+    visual_score: 1
+  "Explain it to them verbally":
+    auditory_score: 1
+  "Write them step-by-step instructions":
+    read_write_score: 1
+
+question_6:
+  "Using mind maps, highlighters, or diagrams":
+    visual_score: 1
+  "Joining a study group or listening to recordings":
+    auditory_score: 1
+  "Writing summaries and rereading notes":
+    read_write_score: 1
