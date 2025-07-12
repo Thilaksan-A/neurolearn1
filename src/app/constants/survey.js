@@ -1,7 +1,7 @@
 export const LearningStyle = Object.freeze({
-    VISUAL: "visual_score",
-    AUDITORY: "auditory_score",
-    READWRITE: "read_write_score",
+    VISUAL: "visual",
+    AUDITORY: "auditory",
+    READWRITE: "reader",
 });
 
 export const SurveyQuestion = Object.freeze({
