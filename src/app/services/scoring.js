@@ -4,9 +4,9 @@ import yaml from "js-yaml";
 import { LearningStyle, SurveyQuestion } from "../constants/survey";
 
 /**
- * 
+ * Loads in scoring_map.yaml to get all scores for all survey questions
  * @param {*} customPath 
- * @returns 
+ * @returns scoringMap
  */
 export function loadScoringMap(customPath) {
     const yamlPath = customPath
@@ -44,6 +44,12 @@ export function loadScoringMap(customPath) {
   return scoringMap;
 }
 
+/**
+ * Aggregates scores based off user's survey answers
+ * @param {*} answers 
+ * @param {*} scoringMap 
+ * @returns 
+ */
 export function calculateScores(answers, scoringMap) {
     const totals = {};
     Object.values(LearningStyle).forEach((ls) => { totals[ls] = 0; });
