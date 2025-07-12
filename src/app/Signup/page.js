@@ -32,7 +32,7 @@ function Signup() {
       }
 
       localStorage.setItem("token", data.token);
-      router.push("/Homepage");
+      router.push("/Signup/Survey");
     } catch (err) {
       setError("Something went wrong. Please try again.");
     }
