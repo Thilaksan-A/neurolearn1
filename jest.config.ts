@@ -10,7 +10,7 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  roots: ["<rootDir>/src/app/tests"],
+  roots: ["<rootDir>/src/tests"],
   testMatch: ["**/*.test.js", "**/*.test.ts", "**/*.test.jsx", "**/*.test.tsx"],
 };
 
