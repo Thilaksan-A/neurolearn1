@@ -1,93 +1,248 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Brain } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
-function Signup() {
+const occupations = [
+  { label: "Student", value: "st" },
+  { label: "Teacher", value: "te" },
+];
+
+const FormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.email("Please enter a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  occupation: z.string({
+    required_error: "Please select an occupation.",
+  }),
+});
+
+export default function Signup() {
   const router = useRouter();
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const form = useForm({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      occupation: "",
+    },
+  });
+
+  const handleSubmit = async (data) => {
     setError("");
+    setIsSubmitting(true);
 
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          learner_type: "visual", // Default learner type - will be updated after survey
+        }),
       });
 
-      const data = await res.json();
+      const responseData = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Signup failed");
+        setError(responseData.error || "Signup failed");
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      router.push("/Signup/Survey");
+      localStorage.setItem("token", responseData.token);
+
+      // Route based on occupation
+      if (data.occupation === "st") {
+        router.push("/Signup/Survey");
+      } else if (data.occupation === "te") {
+        router.push("/TeacherHomepage");
+      }
+
+      toast("Account created successfully!", {
+        description: "Welcome to NeuroLearn!",
+      });
     } catch (err) {
       setError("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const onSubmit = (data) => {
+    handleSubmit(data);
+  };
+
   return (
-    <div className="flex justify-center items-center min-h-screen flex-col">
-      <div className="p-6 rounded-2xl shadow w-90">
-        <p className="text-center pt-5 text-2xl">Sign Up</p>
+    <main className="flex justify-center items-center min-h-screen flex-col bg-gray-50 p-4">
+      <div className="p-6 rounded-2xl shadow-lg bg-white w-full max-w-md">
+        <div className="flex justify-center items-center">
+          <Brain className="h-10 w-10 text-gray-700" />
+        </div>
+        <p className="text-center pt-4 text-2xl font-semibold text-gray-800">
+          Sign Up
+        </p>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 py-3"
+          >
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                {error}
+              </div>
+            )}
 
-        <form className="py-3 px-2" onSubmit={handleSubmit}>
-          <div className="py-3">
-            <p className="mb-2 text-black py-2">Name *</p>
-            <Input
-              type="text"
-              placeholder="Name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter your full name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="py-3">
-            <p className="mb-2 text-black">Email *</p>
-            <Input
-              type="email"
-              placeholder="Email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="py-3">
-            <p className="mb-2 text-black">Password *</p>
-            <Input
-              type="password"
-              placeholder="Password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
 
-          {error && (
-            <div className="text-red-500 text-sm text-center mt-2">{error}</div>
-          )}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div className="pt-4">
-            <Button type="submit" className="w-full">
-              Next
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter your password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="occupation"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>I am a...</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                          aria-label="Select Occupation"
+                        >
+                          {field.value
+                            ? occupations.find(
+                                (occupation) => occupation.value === field.value
+                              )?.label
+                            : "Select"}
+                          <span className="ml-2 opacity-50">▼</span>
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="bg-white border border-gray-200 shadow-md p-3 w-[var(--radix-popover-trigger-width)]">
+                      <Command>
+                        <CommandList>
+                          <CommandGroup>
+                            {occupations.map((occupation) => (
+                              <CommandItem
+                                key={occupation.value}
+                                value={occupation.label}
+                                onSelect={() => {
+                                  form.setValue("occupation", occupation.value);
+                                  form.trigger("occupation");
+                                }}
+                              >
+                                {occupation.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              className="py-3 w-full"
+              type="submit"
+              loading={isSubmitting}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating Account..." : "Create Account"}
             </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
       </div>
-    </div>
+    </main>
   );
 }
-
-export default Signup;
